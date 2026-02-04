@@ -18,6 +18,6 @@ class CreatePatientUseCaseTest {
         val patient = createPatientUseCase(testPatientFirstName, testPatientLastName, testPatientDob)
         assertEquals(testPatientFirstName, patient.firstName)
         assertEquals(testPatientLastName, patient.lastName)
-        assertEquals(testPatientDob, patient.dateOfBirth)
+        assertEquals(testPatientDob, patient.dateOfBirth.toString())
     }
 }
