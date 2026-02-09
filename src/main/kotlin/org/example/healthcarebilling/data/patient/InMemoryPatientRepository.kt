@@ -2,7 +2,9 @@ package org.example.healthcarebilling.data.patient
 
 import org.example.healthcarebilling.domain.patient.Patient
 import org.example.healthcarebilling.domain.patient.PatientRepository
+import org.springframework.stereotype.Repository
 
+@Repository
 class InMemoryPatientRepository : PatientRepository {
 
     private val patients = mutableListOf<Patient>()
