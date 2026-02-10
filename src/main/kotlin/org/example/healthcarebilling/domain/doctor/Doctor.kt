@@ -1,6 +1,7 @@
 package org.example.healthcarebilling.domain.doctor
 
 import java.time.LocalDate
+import java.time.Period
 import java.util.UUID
 
 data class Doctor private constructor(
@@ -25,4 +26,6 @@ data class Doctor private constructor(
         specialty = specialty,
         practiceStartDate = practiceStartDate
     )
+
+    val yearsOfExperience: Int get() = Period.between(practiceStartDate, LocalDate.now()).years
 }
