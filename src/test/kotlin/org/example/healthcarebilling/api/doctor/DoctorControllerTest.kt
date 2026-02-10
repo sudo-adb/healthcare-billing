@@ -1,6 +1,6 @@
-package org.example.healthcarebilling.api.patient
+package org.example.healthcarebilling.api.doctor
 
-import org.example.healthcarebilling.domain.patient.Patient
+import org.example.healthcarebilling.domain.doctor.Doctor
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,39 +12,40 @@ import org.springframework.test.web.servlet.client.RestTestClient
 import org.springframework.test.web.servlet.client.expectBody
 import kotlin.test.assertEquals
 
-
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureRestTestClient
-class PatientControllerTest(@Autowired private val restTestClient: RestTestClient) {
+class DoctorControllerTest(@Autowired private val restTestClient: RestTestClient) {
 
     @LocalServerPort
-    private  val port = 0
-
+    private val port = 0
 
     @Test
-    fun `should create a new patient`() {
+    fun `should create a new doctor`() {
         val jsonRequest = """
         {
-            "firstName": "John",
-            "lastName": "Doe",
-            "dateOfBirth": "1990-01-01"
+            "firstName": "Jane",
+            "lastName": "Smith",
+            "npiNumber": "1234567890",
+            "specialty": "Cardiology",
+            "practiceStartDate": "2015-06-15"
         }
-    """.trimIndent()
+        """.trimIndent()
 
         val response = restTestClient.post()
-            .uri("/patients")
+            .uri("/doctors")
             .contentType(APPLICATION_JSON)
             .body(jsonRequest)
             .exchange()
             .expectStatus().isOk
-            .expectBody<Patient>()
+            .expectBody<Doctor>()
             .returnResult()
 
-        val createdPatient = response.responseBody
-        assertNotNull(createdPatient)
-        assertEquals("John", createdPatient.firstName)
-        assertEquals("Doe", createdPatient.lastName)
-        assertEquals("1990-01-01", createdPatient.dateOfBirth.toString())
+        val createdDoctor = response.responseBody
+        assertNotNull(createdDoctor)
+        assertEquals("Jane", createdDoctor.firstName)
+        assertEquals("Smith", createdDoctor.lastName)
+        assertEquals("1234567890", createdDoctor.npiNumber)
+        assertEquals("Cardiology", createdDoctor.specialty)
+        assertEquals("2015-06-15", createdDoctor.practiceStartDate.toString())
     }
-
 }
