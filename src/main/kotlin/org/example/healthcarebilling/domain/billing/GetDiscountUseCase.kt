@@ -11,9 +11,6 @@ class GetDiscountUseCase(
     private val getCompletedAppointmentCountUseCase: GetCompletedAppointmentCountUseCase,
     @Value($$"${billing.discount.max}") private val maxDiscount: Int
 ) {
-    init {
-        println("Max Discount = $maxDiscount")
-    }
     operator fun invoke(patientId: UUID): Int {
         val completedAppointmentsCount = getCompletedAppointmentCountUseCase(patientId)
         return min(completedAppointmentsCount, maxDiscount)
