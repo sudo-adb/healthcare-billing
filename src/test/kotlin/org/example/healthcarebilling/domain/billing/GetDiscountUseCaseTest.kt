@@ -20,7 +20,8 @@ class GetDiscountUseCaseTest {
     private val patientRepository = InMemoryPatientRepository()
     private val doctorRepository = InMemoryDoctorRepository()
     private val getCompletedAppointmentCountUseCase = GetCompletedAppointmentCountUseCase(appointmentRepository)
-    private val getDiscountUseCase = GetDiscountUseCase(getCompletedAppointmentCountUseCase)
+    private val maxDiscount = 10
+    private val getDiscountUseCase = GetDiscountUseCase(getCompletedAppointmentCountUseCase, maxDiscount)
 
     @Test
     fun `should return 0 discount when patient has no completed appointments`() {
@@ -147,5 +148,28 @@ class GetDiscountUseCaseTest {
         val discount = getDiscountUseCase(patientId)
 
         assertEquals(7, discount)
+    }
+
+    @Test
+    fun `should cap discount at custom max discount`() {
+        val customMaxDiscount = 5
+        val customGetDiscountUseCase = GetDiscountUseCase(getCompletedAppointmentCountUseCase, customMaxDiscount)
+        val patientId = patientRepository.save(patient1).id
+        val doctorId = doctorRepository.save(doctor).id
+
+        // Create 8 completed appointments
+        repeat(8) {
+            val appointment = Appointment(
+                patientId = patientId,
+                doctorId = doctorId,
+                appointmentDateTime = LocalDateTime.of(2026, 1, it + 1, 10, 0)
+            )
+            appointment.status = AppointmentStatus.COMPLETED
+            appointmentRepository.save(appointment)
+        }
+
+        val discount = customGetDiscountUseCase(patientId)
+
+        assertEquals(5, discount)
     }
 }
