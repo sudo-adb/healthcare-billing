@@ -18,7 +18,7 @@ import kotlin.test.assertEquals
 class PatientControllerTest(@Autowired private val restTestClient: RestTestClient) {
 
     @LocalServerPort
-    private  val port = 0
+    private val port = 0
 
 
     @Test
@@ -45,6 +45,46 @@ class PatientControllerTest(@Autowired private val restTestClient: RestTestClien
         assertEquals("John", createdPatient.firstName)
         assertEquals("Doe", createdPatient.lastName)
         assertEquals("1990-01-01", createdPatient.dateOfBirth.toString())
+    }
+
+    @Test
+    fun `should get patient by firstName lastName and dateOfBirth`() {
+        val jsonRequest = """
+        {
+            "firstName": "Bruce",
+            "lastName": "Wayne",
+            "dateOfBirth": "1990-06-15"
+        }
+    """.trimIndent()
+
+        restTestClient.post()
+            .uri("/patients")
+            .contentType(APPLICATION_JSON)
+            .body(jsonRequest)
+            .exchange()
+            .expectStatus().isOk
+
+
+        val response = restTestClient.get()
+            .uri("/patients?firstName=Bruce&lastName=Wayne&dateOfBirth=1990-06-15")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<Patient>()
+            .returnResult()
+
+        val foundPatient = response.responseBody
+        assertNotNull(foundPatient)
+        assertEquals("Bruce", foundPatient.firstName)
+        assertEquals("Wayne", foundPatient.lastName)
+        assertEquals("1990-06-15", foundPatient.dateOfBirth.toString())
+    }
+
+    @Test
+    fun `should return 404 when patient not found`() {
+        restTestClient.get()
+            .uri("/patients?firstName=Nobody&lastName=Whoever&dateOfBirth=2000-01-01")
+            .exchange()
+            .expectStatus().isNotFound
     }
 
 }
