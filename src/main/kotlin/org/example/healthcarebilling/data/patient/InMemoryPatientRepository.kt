@@ -18,7 +18,7 @@ class InMemoryPatientRepository : PatientRepository {
     }
 
     override fun addInsuranceToPatient(patientId: UUID, insurance: Insurance): Patient {
-        val patient = findPatientById(patientId)
+        val patient = findById(patientId) ?: throw IllegalArgumentException("Patient with id $patientId not found")
         patient.insurance = insurance
         return patient
     }
@@ -33,9 +33,7 @@ class InMemoryPatientRepository : PatientRepository {
         }
     }
 
-    private fun findPatientById(patientId: UUID): Patient {
-        val patient = patients.find { it.id == patientId }
-            ?: throw IllegalArgumentException("Patient with id $patientId not found")
-        return patient
+    override fun findById(patientId: UUID): Patient? {
+        return patients.find { it.id == patientId }
     }
 }
