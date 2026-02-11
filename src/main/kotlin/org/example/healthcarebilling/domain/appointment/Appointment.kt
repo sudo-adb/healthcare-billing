@@ -8,7 +8,7 @@ data class Appointment private constructor(
     val patientId: UUID,
     val doctorId: UUID,
     val appointmentTime: LocalDateTime,
-    val status: AppointmentStatus
+    var status: AppointmentStatus
 ) {
     constructor(
         patientId: UUID,

@@ -1,9 +1,10 @@
 package org.example.healthcarebilling.api.appointment
 
+import org.example.healthcarebilling.doctor
 import org.example.healthcarebilling.domain.appointment.Appointment
 import org.example.healthcarebilling.domain.appointment.AppointmentStatus
-import org.example.healthcarebilling.domain.doctor.Doctor
-import org.example.healthcarebilling.domain.patient.Patient
+import org.example.healthcarebilling.patient1
+import org.example.healthcarebilling.patient2
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.springframework.beans.factory.annotation.Autowired
@@ -12,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
 import org.springframework.test.web.servlet.client.RestTestClient
 import org.springframework.test.web.servlet.client.expectBody
-import java.time.LocalDate
 import kotlin.test.assertEquals
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -25,14 +25,8 @@ class AppointmentControllerTest(@Autowired private val restTestClient: RestTestC
 
     @Test
     fun `should create appointment with SCHEDULED status by default`() {
-        val patientId = Patient(firstName = "John", lastName = "Doe", dateOfBirth = LocalDate.of(1990, 6, 15)).id
-        val doctorId = Doctor(
-            firstName = "Jane",
-            lastName = "Smith",
-            npiNumber = "1234567890",
-            specialty = "Cardiology",
-            practiceStartDate = LocalDate.of(2015, 6, 15)
-        ).id
+        val patientId = patient1.id
+        val doctorId = doctor.id
 
         val request = """
         {
@@ -58,15 +52,9 @@ class AppointmentControllerTest(@Autowired private val restTestClient: RestTestC
 
     @Test
     fun `should create appointment for different patients and doctors`() {
-        val patient1Id = Patient(firstName = "John", lastName = "Doe", dateOfBirth = LocalDate.of(1990, 6, 15)).id
-        val patient2Id = Patient(firstName = "Bruce", lastName = "Wayne", dateOfBirth = LocalDate.of(1990, 6, 15)).id
-        val doctorId = Doctor(
-            firstName = "Jane",
-            lastName = "Smith",
-            npiNumber = "1234567890",
-            specialty = "Cardiology",
-            practiceStartDate = LocalDate.of(2015, 6, 15)
-        ).id
+        val patient1Id = patient1.id
+        val patient2Id = patient2.id
+        val doctorId = doctor.id
 
         val request = """
         {
