@@ -3,7 +3,6 @@ package org.example.healthcarebilling.api.billing
 import org.example.healthcarebilling.api.createDoctorRequest
 import org.example.healthcarebilling.api.createPatientRequest
 import org.example.healthcarebilling.domain.appointment.Appointment
-import org.example.healthcarebilling.domain.appointment.AppointmentRepository
 import org.example.healthcarebilling.domain.appointment.AppointmentStatus
 import org.example.healthcarebilling.domain.billing.Bill
 import org.example.healthcarebilling.domain.doctor.Doctor
@@ -18,16 +17,12 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.client.RestTestClient
 import org.springframework.test.web.servlet.client.expectBody
 import java.math.BigDecimal
-import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.assertEquals
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureRestTestClient
-class BillingControllerTest(
-    @Autowired private val restTestClient: RestTestClient,
-    @Autowired private val appointmentRepository: AppointmentRepository
-) {
+class BillingControllerTest(@Autowired private val restTestClient: RestTestClient) {
 
     @LocalServerPort
     private val port = 0
@@ -171,14 +166,44 @@ class BillingControllerTest(
         val createdDoctor = doctorResponse.responseBody
         assertNotNull(createdDoctor)
 
-        repeat(5) { // TODO create appointments using api
-            val appointment = Appointment(
-                patientId = createdPatient.id,
-                doctorId = createdDoctor.id,
-                appointmentDateTime = LocalDateTime.of(2026, 1, it + 1, 10, 0)
-            )
-            appointment.status = AppointmentStatus.COMPLETED
-            appointmentRepository.save(appointment)
+        repeat(5) {
+            val createAppointmentRequest = """
+        {
+            "patientId": "${createdPatient.id}",
+            "doctorId": "${createdDoctor.id}",
+            "appointmentDateTime": "2026-03-01T11:00:00"
+        }
+        """.trimIndent()
+            val createResponse = restTestClient.post()
+                .uri("/appointments")
+                .contentType(APPLICATION_JSON)
+                .body(createAppointmentRequest)
+                .exchange()
+                .expectStatus().isOk
+                .expectBody<Appointment>()
+                .returnResult()
+
+            val createdAppointment = createResponse.responseBody
+            assertNotNull(createdAppointment)
+            assertEquals(AppointmentStatus.SCHEDULED, createdAppointment.status)
+
+            val updateRequest = """
+        {
+            "status": "COMPLETED"
+        }
+        """.trimIndent()
+
+            val updateResponse = restTestClient.patch()
+                .uri("/appointments/${createdAppointment.id}/status")
+                .contentType(APPLICATION_JSON)
+                .body(updateRequest)
+                .exchange()
+                .expectStatus().isOk
+                .expectBody<Appointment>()
+                .returnResult()
+
+            val updatedAppointment = updateResponse.responseBody
+            assertNotNull(updatedAppointment)
         }
 
         val generateBillRequest = """
