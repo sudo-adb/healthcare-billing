@@ -21,4 +21,8 @@ class InMemoryAppointmentRepository : AppointmentRepository {
             it.patientId == patientId && it.status == AppointmentStatus.COMPLETED
         }
     }
+
+    override fun findById(id: UUID): Appointment? {
+        return appointments.firstOrNull { it.id == id }
+    }
 }

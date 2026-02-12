@@ -20,3 +20,11 @@ val createDoctorRequest = """
             "practiceStartDate": "${doctor.practiceStartDate}"
         }
         """.trimIndent()
+
+val createAppointmentRequest = """
+        {
+            "patientId": "${patient1.id}",
+            "doctorId": "${doctor.id}",
+            "appointmentDateTime": "2026-03-01T11:00:00"
+        }
+        """.trimIndent()

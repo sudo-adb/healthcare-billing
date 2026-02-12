@@ -1,0 +1,70 @@
+package org.example.healthcarebilling.domain.appointment
+
+import org.example.healthcarebilling.data.appointment.InMemoryAppointmentRepository
+import org.example.healthcarebilling.doctor
+import org.example.healthcarebilling.patient1
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.assertThrows
+import java.time.LocalDateTime
+import java.util.*
+import kotlin.test.Test
+
+class UpdateAppointmentStatusUseCaseTest {
+
+    private val appointmentRepository = InMemoryAppointmentRepository()
+    private val updateAppointmentStatusUseCase = UpdateAppointmentStatusUseCase(appointmentRepository)
+
+    @Test
+    fun `should update appointment status to COMPLETED`() {
+        val patientId = patient1.id
+        val doctorId = doctor.id
+        val appointmentDateTime = LocalDateTime.of(2026, 2, 15, 10, 30)
+
+        val appointment = Appointment(
+            patientId = patientId,
+            doctorId = doctorId,
+            appointmentDateTime = appointmentDateTime
+        )
+        val savedAppointment = appointmentRepository.save(appointment)
+
+        assertEquals(AppointmentStatus.SCHEDULED, savedAppointment.status)
+
+        val updatedAppointment = updateAppointmentStatusUseCase(savedAppointment.id, AppointmentStatus.COMPLETED)
+
+        assertNotNull(updatedAppointment)
+        assertEquals(savedAppointment.id, updatedAppointment.id)
+        assertEquals(AppointmentStatus.COMPLETED, updatedAppointment.status)
+    }
+
+    @Test
+    fun `should update appointment status to CANCELLED`() {
+        val patientId = patient1.id
+        val doctorId = doctor.id
+        val appointmentDateTime = LocalDateTime.of(2026, 2, 15, 10, 30)
+
+        val appointment = Appointment(
+            patientId = patientId,
+            doctorId = doctorId,
+            appointmentDateTime = appointmentDateTime
+        )
+        val savedAppointment = appointmentRepository.save(appointment)
+
+        val updatedAppointment = updateAppointmentStatusUseCase(savedAppointment.id, AppointmentStatus.CANCELLED)
+
+        assertNotNull(updatedAppointment)
+        assertEquals(savedAppointment.id, updatedAppointment.id)
+        assertEquals(AppointmentStatus.CANCELLED, updatedAppointment.status)
+    }
+
+    @Test
+    fun `should throw exception when appointment not found`() {
+        val nonExistentId = UUID.randomUUID()
+
+        val exception = assertThrows<IllegalArgumentException> {
+            updateAppointmentStatusUseCase(nonExistentId, AppointmentStatus.COMPLETED)
+        }
+
+        assertEquals("Appointment with id $nonExistentId not found", exception.message)
+    }
+}

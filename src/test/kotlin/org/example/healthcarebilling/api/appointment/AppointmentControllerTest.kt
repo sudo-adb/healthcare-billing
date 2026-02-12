@@ -1,5 +1,6 @@
 package org.example.healthcarebilling.api.appointment
 
+import org.example.healthcarebilling.api.createAppointmentRequest
 import org.example.healthcarebilling.doctor
 import org.example.healthcarebilling.domain.appointment.Appointment
 import org.example.healthcarebilling.domain.appointment.AppointmentStatus
@@ -11,8 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.client.RestTestClient
 import org.springframework.test.web.servlet.client.expectBody
+import java.util.UUID
 import kotlin.test.assertEquals
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -38,7 +41,7 @@ class AppointmentControllerTest(@Autowired private val restTestClient: RestTestC
 
         val response = restTestClient.post()
             .uri("/appointments")
-            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+            .contentType(APPLICATION_JSON)
             .body(request)
             .exchange()
             .expectStatus().isOk
@@ -66,7 +69,7 @@ class AppointmentControllerTest(@Autowired private val restTestClient: RestTestC
 
         val response1 = restTestClient.post()
             .uri("/appointments")
-            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+            .contentType(APPLICATION_JSON)
             .body(request)
             .exchange()
             .expectStatus().isOk
@@ -84,7 +87,7 @@ class AppointmentControllerTest(@Autowired private val restTestClient: RestTestC
 
         val response2 = restTestClient.post()
             .uri("/appointments")
-            .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
+            .contentType(APPLICATION_JSON)
             .body(request2)
             .exchange()
             .expectStatus().isOk
@@ -100,5 +103,95 @@ class AppointmentControllerTest(@Autowired private val restTestClient: RestTestC
         assertEquals(patient2Id, appointment2.patientId)
         assertEquals(doctorId, appointment1.doctorId)
         assertEquals(doctorId, appointment2.doctorId)
+    }
+
+    @Test
+    fun `should update appointment status to COMPLETED`() {
+
+        val createResponse = restTestClient.post()
+            .uri("/appointments")
+            .contentType(APPLICATION_JSON)
+            .body(createAppointmentRequest)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<Appointment>()
+            .returnResult()
+
+        val createdAppointment = createResponse.responseBody
+        assertNotNull(createdAppointment)
+        assertEquals(AppointmentStatus.SCHEDULED, createdAppointment.status)
+
+        val updateRequest = """
+        {
+            "status": "COMPLETED"
+        }
+        """.trimIndent()
+
+        val updateResponse = restTestClient.patch()
+            .uri("/appointments/${createdAppointment.id}/status")
+            .contentType(APPLICATION_JSON)
+            .body(updateRequest)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<Appointment>()
+            .returnResult()
+
+        val updatedAppointment = updateResponse.responseBody
+        assertNotNull(updatedAppointment)
+        assertEquals(createdAppointment.id, updatedAppointment.id)
+        assertEquals(AppointmentStatus.COMPLETED, updatedAppointment.status)
+    }
+
+    @Test
+    fun `should update appointment status to CANCELLED`() {
+
+        val createResponse = restTestClient.post()
+            .uri("/appointments")
+            .contentType(APPLICATION_JSON)
+            .body(createAppointmentRequest)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<Appointment>()
+            .returnResult()
+
+        val createdAppointment = createResponse.responseBody
+        assertNotNull(createdAppointment)
+
+        val updateRequest = """
+        {
+            "status": "CANCELLED"
+        }
+        """.trimIndent()
+
+        val updateResponse = restTestClient.patch()
+            .uri("/appointments/${createdAppointment.id}/status")
+            .contentType(APPLICATION_JSON)
+            .body(updateRequest)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<Appointment>()
+            .returnResult()
+
+        val updatedAppointment = updateResponse.responseBody
+        assertNotNull(updatedAppointment)
+        assertEquals(AppointmentStatus.CANCELLED, updatedAppointment.status)
+    }
+
+    @Test
+    fun `should return error when updating non-existent appointment`() {
+        val nonExistentId = UUID.randomUUID()
+
+        val updateRequest = """
+        {
+            "status": "COMPLETED"
+        }
+        """.trimIndent()
+
+        restTestClient.patch()
+            .uri("/appointments/$nonExistentId/status")
+            .contentType(APPLICATION_JSON)
+            .body(updateRequest)
+            .exchange()
+            .expectStatus().is5xxServerError
     }
 }
