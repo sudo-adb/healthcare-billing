@@ -25,4 +25,17 @@ class InMemoryAppointmentRepository : AppointmentRepository {
     override fun findById(id: UUID): Appointment? {
         return appointments.firstOrNull { it.id == id }
     }
+
+    override fun update(
+        appointment: Appointment,
+        status: AppointmentStatus
+    ): Appointment {
+        val index = appointments.indexOfFirst { it.id == appointment.id }
+        if (index == -1) {
+            throw IllegalArgumentException("Appointment with id ${appointment.id} not found")
+        }
+        val updatedAppointment = appointment.copy(status = status)
+        appointments[index] = updatedAppointment
+        return updatedAppointment
+    }
 }

@@ -1,7 +1,7 @@
 package org.example.healthcarebilling.domain.appointment
 
 import org.springframework.stereotype.Component
-import java.util.UUID
+import java.util.*
 
 @Component
 class UpdateAppointmentStatusUseCase(
@@ -12,7 +12,6 @@ class UpdateAppointmentStatusUseCase(
         val appointment = appointmentRepository.findById(appointmentId)
             ?: throw IllegalArgumentException("Appointment with id $appointmentId not found")
 
-        appointment.status = status
-        return appointmentRepository.save(appointment)
+        return appointmentRepository.update(appointment, status)
     }
 }
