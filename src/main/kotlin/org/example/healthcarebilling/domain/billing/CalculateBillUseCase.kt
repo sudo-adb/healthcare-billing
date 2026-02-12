@@ -11,7 +11,8 @@ class CalculateBillUseCase(
     private val patientRepository: PatientRepository,
     private val doctorRepository: DoctorRepository,
     private val getConsultationChargeUseCase: GetConsultationChargeUseCase,
-    private val getDiscountUseCase: GetDiscountUseCase
+    private val getDiscountUseCase: GetDiscountUseCase,
+    private val getTaxUseCase: GetTaxUseCase
 ) {
 
     operator fun invoke(patientId: UUID, doctorId: UUID): Bill {
@@ -27,12 +28,14 @@ class CalculateBillUseCase(
         )
 
         val discountPercentage = getDiscountUseCase(patient.id)
+        val taxPercentage = getTaxUseCase()
 
         val bill = Bill(
             patientId = patient.id,
             doctorId = doctor.id,
             consultationCharge = consultationCharge,
-            discountPercentage = discountPercentage
+            discountPercentage = discountPercentage,
+            taxPercentage = taxPercentage
         )
 
         return bill

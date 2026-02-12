@@ -11,19 +11,22 @@ data class Bill private constructor(
     val doctorId: UUID,
     val consultationCharge: BigDecimal,
     val discountPercentage: Int,
+    val taxPercentage: Int,
     val billingDate: LocalDateTime
 ) {
     constructor(
         patientId: UUID,
         doctorId: UUID,
         consultationCharge: BigDecimal,
-        discountPercentage: Int
+        discountPercentage: Int,
+        taxPercentage: Int
     ) : this(
         id = UUID.randomUUID(),
         patientId = patientId,
         doctorId = doctorId,
         consultationCharge = consultationCharge,
         discountPercentage = discountPercentage,
+        taxPercentage = taxPercentage,
         billingDate = LocalDateTime.now()
     )
 
@@ -31,5 +34,11 @@ data class Bill private constructor(
         .multiply(BigDecimal(discountPercentage))
         .divide(BigDecimal(100), 2, RoundingMode.HALF_UP)
 
-    val finalAmount: BigDecimal = consultationCharge - discountAmount
+    val amountAfterDiscount: BigDecimal = consultationCharge - discountAmount
+
+    val taxAmount: BigDecimal = amountAfterDiscount
+        .multiply(BigDecimal(taxPercentage))
+        .divide(BigDecimal(100), 2, RoundingMode.HALF_UP)
+
+    val finalAmount: BigDecimal = amountAfterDiscount + taxAmount
 }
