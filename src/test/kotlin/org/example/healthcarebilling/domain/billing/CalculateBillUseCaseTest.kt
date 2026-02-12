@@ -1,9 +1,13 @@
 package org.example.healthcarebilling.domain.billing
 
+import org.example.healthcarebilling.data.appointment.InMemoryAppointmentRepository
 import org.example.healthcarebilling.data.doctor.InMemoryConsultationChargeRepository
 import org.example.healthcarebilling.data.doctor.InMemoryDoctorRepository
 import org.example.healthcarebilling.data.patient.InMemoryPatientRepository
 import org.example.healthcarebilling.doctor
+import org.example.healthcarebilling.domain.appointment.Appointment
+import org.example.healthcarebilling.domain.appointment.AppointmentStatus
+import org.example.healthcarebilling.domain.appointment.GetCompletedAppointmentCountUseCase
 import org.example.healthcarebilling.domain.doctor.GetConsultationChargeUseCase
 import org.example.healthcarebilling.highExpOrthoDoctor
 import org.example.healthcarebilling.mediumExpCardioDoctor
@@ -12,6 +16,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.assertThrows
 import java.math.BigDecimal
+import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.Test
 
@@ -20,9 +25,14 @@ class CalculateBillUseCaseTest {
     private val patientRepository = InMemoryPatientRepository()
     private val doctorRepository = InMemoryDoctorRepository()
     private val consultationChargeRepository = InMemoryConsultationChargeRepository()
+    private val appointmentRepository = InMemoryAppointmentRepository()
 
     private val getConsultationChargeUseCase = GetConsultationChargeUseCase(consultationChargeRepository)
-    private val calculateBillUseCase = CalculateBillUseCase(patientRepository, doctorRepository, getConsultationChargeUseCase)
+    val getCompletedAppointmentCountUseCase = GetCompletedAppointmentCountUseCase(appointmentRepository)
+    val maxDiscount = 10
+    private val getDiscountUseCase = GetDiscountUseCase(getCompletedAppointmentCountUseCase, maxDiscount = maxDiscount)
+    private val calculateBillUseCase =
+        CalculateBillUseCase(patientRepository, doctorRepository, getConsultationChargeUseCase, getDiscountUseCase)
 
     @Test
     fun `should calculate bill for patient consultation with doctor`() {
@@ -87,4 +97,54 @@ class CalculateBillUseCaseTest {
 
         assertEquals("Doctor with id $nonExistentDoctorId not found", exception.message)
     }
+
+    @Test
+    fun `should calculate bill with 5 percent discount for patient with 5 completed appointments`() {
+        val patient = patientRepository.save(patient1)
+        val doctor = doctorRepository.save(doctor)
+
+        // Create 5 completed appointments for the patient
+        repeat(5) {
+            val appointment = Appointment(
+                patientId = patient.id,
+                doctorId = doctor.id,
+                appointmentDateTime = LocalDateTime.of(2026, 1, it + 1, 10, 0)
+            )
+            appointment.status = AppointmentStatus.COMPLETED
+            appointmentRepository.save(appointment)
+        }
+
+        val bill = calculateBillUseCase(patient.id, doctor.id)
+
+        assertEquals(BigDecimal("1000.00"), bill.consultationCharge)
+        assertEquals(5, bill.discountPercentage)
+        assertEquals(BigDecimal("50.00"), bill.discountAmount)
+        assertEquals(BigDecimal("950.00"), bill.finalAmount)
+    }
+
+
+    @Test
+    fun `should cap discount at max percent even if patient has more completed appointments`() {
+        val patient = patientRepository.save(patient1)
+        val doctor = doctorRepository.save(highExpOrthoDoctor)
+
+        // Create 15 completed appointments for the patient
+        repeat(15) {
+            val appointment = Appointment(
+                patientId = patient.id,
+                doctorId = doctor.id,
+                appointmentDateTime = LocalDateTime.of(2026, 1, it + 1, 10, 0)
+            )
+            appointment.status = AppointmentStatus.COMPLETED
+            appointmentRepository.save(appointment)
+        }
+
+        val bill = calculateBillUseCase(patient.id, doctor.id)
+
+        assertEquals(BigDecimal("1200.00"), bill.consultationCharge)
+        assertEquals(maxDiscount, bill.discountPercentage)
+        assertEquals(BigDecimal("120.00"), bill.discountAmount)
+        assertEquals(BigDecimal("1080.00"), bill.finalAmount)
+    }
+
 }
