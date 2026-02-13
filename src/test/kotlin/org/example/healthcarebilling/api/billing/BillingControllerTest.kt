@@ -82,6 +82,7 @@ class BillingControllerTest(@Autowired private val restTestClient: RestTestClien
         assertEquals(12, generatedBill.taxPercentage)
         assertEquals(BigDecimal("120.00"), generatedBill.taxAmount)
         assertEquals(BigDecimal("1120.00"), generatedBill.finalAmount)
+        assertEquals(BigDecimal("112.00"), generatedBill.copayAmount)
         assertNotNull(generatedBill.billingDate)
     }
 
@@ -234,6 +235,7 @@ class BillingControllerTest(@Autowired private val restTestClient: RestTestClien
         assertEquals(12, generatedBill.taxPercentage)
         assertEquals(BigDecimal("114.00"), generatedBill.taxAmount)
         assertEquals(BigDecimal("1064.00"), generatedBill.finalAmount)
+        assertEquals(BigDecimal("106.40"), generatedBill.copayAmount)
         assertNotNull(generatedBill.billingDate)
     }
 }

@@ -36,12 +36,16 @@ class CalculateBillUseCaseTest {
     val taxPercentage = 12
     private val getTaxUseCase = GetTaxUseCase(taxPercentage)
 
+    val copayPercentage = 10
+    private val getCopayUseCase = GetCopayUseCase(copayPercentage)
+
     private val calculateBillUseCase = CalculateBillUseCase(
         patientRepository,
         doctorRepository,
         getConsultationChargeUseCase,
         getDiscountUseCase,
-        getTaxUseCase
+        getTaxUseCase,
+        getCopayUseCase,
     )
 
     @Test
@@ -109,7 +113,7 @@ class CalculateBillUseCaseTest {
     }
 
     @Test
-    fun `should calculate bill with 5 percent discount for patient with 5 completed appointments and applicable tax`() {
+    fun `should calculate bill with 5 percent discount for patient with 5 completed appointments,applicable tax and copayAmount`() {
         val patient = patientRepository.save(patient1)
         val doctor = doctorRepository.save(doctor)
 
@@ -133,11 +137,12 @@ class CalculateBillUseCaseTest {
         assertEquals(taxPercentage, bill.taxPercentage)
         assertEquals(BigDecimal("114.00"), bill.taxAmount)
         assertEquals(BigDecimal("1064.00"), bill.finalAmount)
+        assertEquals(BigDecimal("106.40"), bill.copayAmount)
     }
 
 
     @Test
-    fun `should calculate bill with cap discount at max percent even if patient has more completed appointments and applicable tax`() {
+    fun `should calculate bill with cap discount at max percent even if patient has more completed appointments,applicable tax and copayAmount`() {
         val patient = patientRepository.save(patient1)
         val doctor = doctorRepository.save(highExpOrthoDoctor)
 
@@ -161,6 +166,7 @@ class CalculateBillUseCaseTest {
         assertEquals(taxPercentage, bill.taxPercentage)
         assertEquals(BigDecimal("129.60"), bill.taxAmount)
         assertEquals(BigDecimal("1209.60"), bill.finalAmount)
+        assertEquals(BigDecimal("120.96"), bill.copayAmount)
 
     }
 

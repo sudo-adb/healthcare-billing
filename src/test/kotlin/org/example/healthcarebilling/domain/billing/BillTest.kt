@@ -15,13 +15,15 @@ class BillTest {
         val consultationCharge = BigDecimal("800.00")
         val discountPercentage = 0
         val taxPercentage = 0
+        val copayPercentage = 0
 
         val bill = Bill(
             patientId = patientId,
             doctorId = doctorId,
             consultationCharge = consultationCharge,
             discountPercentage = discountPercentage,
-            taxPercentage = taxPercentage
+            taxPercentage = taxPercentage,
+            copayPercentage = copayPercentage
         )
 
         assertNotNull(bill.id)
@@ -41,13 +43,15 @@ class BillTest {
         val consultationCharge = BigDecimal("1000.00")
         val discountPercentage = 10
         val taxPercentage = 12
+        val copayPercentage = 10
 
         val bill = Bill(
             patientId = patientId,
             doctorId = doctorId,
             consultationCharge = consultationCharge,
             discountPercentage = discountPercentage,
-            taxPercentage = taxPercentage
+            taxPercentage = taxPercentage,
+            copayPercentage = copayPercentage
         )
 
         assertEquals(10, bill.discountPercentage)
@@ -56,5 +60,6 @@ class BillTest {
         assertEquals(12, bill.taxPercentage)
         assertEquals(BigDecimal("108.00"), bill.taxAmount)
         assertEquals(BigDecimal("1008.00"), bill.finalAmount)
+        assertEquals(BigDecimal("100.80"), bill.copayAmount)
     }
 }
