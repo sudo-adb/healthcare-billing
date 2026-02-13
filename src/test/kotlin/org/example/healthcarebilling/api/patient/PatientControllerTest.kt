@@ -87,4 +87,57 @@ class PatientControllerTest(@Autowired private val restTestClient: RestTestClien
             .expectStatus().isNotFound
     }
 
+    @Test
+    fun `should return 400 when firstName is blank`() {
+        val jsonRequest = """
+        {
+            "firstName": "",
+            "lastName": "Doe",
+            "dateOfBirth": "1990-01-01"
+        }
+        """.trimIndent()
+
+        restTestClient.post()
+            .uri("/patients")
+            .contentType(APPLICATION_JSON)
+            .body(jsonRequest)
+            .exchange()
+            .expectStatus().isBadRequest
+    }
+
+    @Test
+    fun `should return 400 when lastName is blank`() {
+        val jsonRequest = """
+        {
+            "firstName": "John",
+            "lastName": "",
+            "dateOfBirth": "1990-01-01"
+        }
+        """.trimIndent()
+
+        restTestClient.post()
+            .uri("/patients")
+            .contentType(APPLICATION_JSON)
+            .body(jsonRequest)
+            .exchange()
+            .expectStatus().isBadRequest
+    }
+
+    @Test
+    fun `should return 400 when dateOfBirth is in the future`() {
+        val jsonRequest = """
+        {
+            "firstName": "John",
+            "lastName": "Doe",
+            "dateOfBirth": "2027-01-01"
+        }
+        """.trimIndent()
+
+        restTestClient.post()
+            .uri("/patients")
+            .contentType(APPLICATION_JSON)
+            .body(jsonRequest)
+            .exchange()
+            .expectStatus().isBadRequest
+    }
 }

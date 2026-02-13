@@ -1,5 +1,6 @@
 package org.example.healthcarebilling.api.doctor
 
+import jakarta.validation.Valid
 import org.example.healthcarebilling.domain.doctor.CreateDoctorUseCase
 import org.example.healthcarebilling.domain.doctor.Doctor
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 class DoctorController @Autowired constructor(private val createDoctorUseCase: CreateDoctorUseCase) {
 
     @PostMapping("/doctors")
-    fun createDoctor(@RequestBody request: CreateDoctorRequest): Doctor {
+    fun createDoctor(@Valid @RequestBody request: CreateDoctorRequest): Doctor {
         return createDoctorUseCase(
             request.firstName,
             request.lastName,

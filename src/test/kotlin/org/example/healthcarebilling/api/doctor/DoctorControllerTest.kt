@@ -48,4 +48,84 @@ class DoctorControllerTest(@Autowired private val restTestClient: RestTestClient
         assertEquals("Cardiology", createdDoctor.specialty)
         assertEquals("2015-06-15", createdDoctor.practiceStartDate.toString())
     }
+
+    @Test
+    fun `should return 400 when firstName is blank`() {
+        val jsonRequest = """
+        {
+            "firstName": "",
+            "lastName": "Smith",
+            "npiNumber": "1234567890",
+            "specialty": "Cardiology",
+            "practiceStartDate": "2015-06-15"
+        }
+        """.trimIndent()
+
+        restTestClient.post()
+            .uri("/doctors")
+            .contentType(APPLICATION_JSON)
+            .body(jsonRequest)
+            .exchange()
+            .expectStatus().isBadRequest
+    }
+
+    @Test
+    fun `should return 400 when lastName is blank`() {
+        val jsonRequest = """
+        {
+            "firstName": "Jane",
+            "lastName": "",
+            "npiNumber": "1234567890",
+            "specialty": "Cardiology",
+            "practiceStartDate": "2015-06-15"
+        }
+        """.trimIndent()
+
+        restTestClient.post()
+            .uri("/doctors")
+            .contentType(APPLICATION_JSON)
+            .body(jsonRequest)
+            .exchange()
+            .expectStatus().isBadRequest
+    }
+
+    @Test
+    fun `should return 400 when npiNumber is blank`() {
+        val jsonRequest = """
+        {
+            "firstName": "Jane",
+            "lastName": "Smith",
+            "npiNumber": "",
+            "specialty": "Cardiology",
+            "practiceStartDate": "2015-06-15"
+        }
+        """.trimIndent()
+
+        restTestClient.post()
+            .uri("/doctors")
+            .contentType(APPLICATION_JSON)
+            .body(jsonRequest)
+            .exchange()
+            .expectStatus().isBadRequest
+    }
+
+    @Test
+    fun `should return 400 when practiceStartDate is in the future`() {
+        val jsonRequest = """
+        {
+            "firstName": "Jane",
+            "lastName": "Smith",
+            "npiNumber": "1234567890",
+            "specialty": "Cardiology",
+            "practiceStartDate": "2027-01-01"
+        }
+        """.trimIndent()
+
+        restTestClient.post()
+            .uri("/doctors")
+            .contentType(APPLICATION_JSON)
+            .body(jsonRequest)
+            .exchange()
+            .expectStatus().isBadRequest
+    }
 }

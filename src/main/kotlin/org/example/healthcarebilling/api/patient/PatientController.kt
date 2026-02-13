@@ -1,5 +1,6 @@
 package org.example.healthcarebilling.api.patient
 
+import jakarta.validation.Valid
 import org.example.healthcarebilling.domain.patient.CreatePatientUseCase
 import org.example.healthcarebilling.domain.patient.GetPatientUseCase
 import org.example.healthcarebilling.domain.patient.Patient
@@ -15,7 +16,7 @@ class PatientController @Autowired constructor(
 ) {
 
     @PostMapping("/patients")
-    fun createPatient(@RequestBody patient: CreatePatientRequest): Patient {
+    fun createPatient(@Valid @RequestBody patient: CreatePatientRequest): Patient {
         return createPatientUseCase(
             patient.firstName,
             patient.lastName,
