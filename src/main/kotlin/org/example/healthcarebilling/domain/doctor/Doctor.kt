@@ -4,7 +4,7 @@ import java.time.LocalDate
 import java.time.Period
 import java.util.UUID
 
-data class Doctor private constructor(
+data class Doctor(
     val id: UUID,
     val firstName: String,
     val lastName: String,
