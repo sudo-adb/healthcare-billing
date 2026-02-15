@@ -35,3 +35,4 @@ class InMemoryPatientRepository : PatientRepository {
         return patients.find { it.id == patientId }
     }
 }
+
