@@ -5,7 +5,7 @@ import java.time.LocalDate
 import java.time.Period
 import java.util.UUID
 
-data class Patient private constructor(
+data class Patient(
     val id: UUID = UUID.randomUUID(),
     val firstName: String,
     val lastName: String,
