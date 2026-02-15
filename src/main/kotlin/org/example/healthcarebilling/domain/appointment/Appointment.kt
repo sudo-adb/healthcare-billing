@@ -3,7 +3,7 @@ package org.example.healthcarebilling.domain.appointment
 import java.time.LocalDateTime
 import java.util.UUID
 
-data class Appointment private constructor(
+data class Appointment(
     val id: UUID,
     val patientId: UUID,
     val doctorId: UUID,
