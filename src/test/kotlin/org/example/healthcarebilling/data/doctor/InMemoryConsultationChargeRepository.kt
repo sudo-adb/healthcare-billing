@@ -2,10 +2,8 @@ package org.example.healthcarebilling.data.doctor
 
 import org.example.healthcarebilling.domain.doctor.ConsultationCharge
 import org.example.healthcarebilling.domain.doctor.ConsultationChargeRepository
-import org.springframework.stereotype.Repository
 import java.math.BigDecimal
 
-@Repository
 class InMemoryConsultationChargeRepository : ConsultationChargeRepository {
 
     private val charges = mutableListOf<ConsultationCharge>()
@@ -38,3 +36,4 @@ class InMemoryConsultationChargeRepository : ConsultationChargeRepository {
         return charges.firstOrNull { it.specialty == "GENERAL" && it.isApplicable("GENERAL", yearsOfExperience) }
     }
 }
+
