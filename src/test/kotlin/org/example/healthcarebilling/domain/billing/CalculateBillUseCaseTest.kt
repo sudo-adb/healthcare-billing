@@ -1,52 +1,45 @@
 package org.example.healthcarebilling.domain.billing
 
-import org.example.healthcarebilling.data.appointment.InMemoryAppointmentRepository
-import org.example.healthcarebilling.data.doctor.InMemoryConsultationChargeRepository
-import org.example.healthcarebilling.data.doctor.InMemoryDoctorRepository
-import org.example.healthcarebilling.data.patient.InMemoryPatientRepository
 import org.example.healthcarebilling.doctor
 import org.example.healthcarebilling.domain.appointment.Appointment
+import org.example.healthcarebilling.domain.appointment.AppointmentRepository
 import org.example.healthcarebilling.domain.appointment.AppointmentStatus
-import org.example.healthcarebilling.domain.appointment.GetCompletedAppointmentCountUseCase
-import org.example.healthcarebilling.domain.doctor.GetConsultationChargeUseCase
+import org.example.healthcarebilling.domain.doctor.DoctorRepository
+import org.example.healthcarebilling.domain.patient.PatientRepository
 import org.example.healthcarebilling.highExpOrthoDoctor
 import org.example.healthcarebilling.mediumExpCardioDoctor
 import org.example.healthcarebilling.patient1
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.assertThrows
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.annotation.DirtiesContext
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.Test
 
+@SpringBootTest
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class CalculateBillUseCaseTest {
 
-    private val patientRepository = InMemoryPatientRepository()
-    private val doctorRepository = InMemoryDoctorRepository()
-    private val consultationChargeRepository = InMemoryConsultationChargeRepository()
-    private val appointmentRepository = InMemoryAppointmentRepository()
+    @Autowired
+    private lateinit var patientRepository: PatientRepository
 
-    private val getConsultationChargeUseCase = GetConsultationChargeUseCase(consultationChargeRepository)
-    val getCompletedAppointmentCountUseCase = GetCompletedAppointmentCountUseCase(appointmentRepository)
+    @Autowired
+    private lateinit var doctorRepository: DoctorRepository
 
-    val maxDiscount = 10
-    private val getDiscountUseCase = GetDiscountUseCase(getCompletedAppointmentCountUseCase, maxDiscount = maxDiscount)
+    @Autowired
+    private lateinit var appointmentRepository: AppointmentRepository
 
-    val taxPercentage = 12
-    private val getTaxUseCase = GetTaxUseCase(taxPercentage)
+    @Autowired
+    private lateinit var calculateBillUseCase: CalculateBillUseCase
 
-    val copayPercentage = 10
-    private val getCopayUseCase = GetCopayUseCase(copayPercentage)
-
-    private val calculateBillUseCase = CalculateBillUseCase(
-        patientRepository,
-        doctorRepository,
-        getConsultationChargeUseCase,
-        getDiscountUseCase,
-        getTaxUseCase,
-        getCopayUseCase,
-    )
+    private val maxDiscount = 10
+    private val taxPercentage = 12
 
     @Test
     fun `should calculate bill for patient consultation with doctor`() {

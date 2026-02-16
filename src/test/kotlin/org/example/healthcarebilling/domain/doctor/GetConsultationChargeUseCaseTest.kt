@@ -1,14 +1,18 @@
 package org.example.healthcarebilling.domain.doctor
 
-import org.example.healthcarebilling.data.doctor.InMemoryConsultationChargeRepository
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
 import java.math.BigDecimal
 import kotlin.test.Test
 
+@SpringBootTest
+@Transactional
 class GetConsultationChargeUseCaseTest {
 
-    private val consultationChargeRepository = InMemoryConsultationChargeRepository()
-    private val getConsultationChargeUseCase = GetConsultationChargeUseCase(consultationChargeRepository)
+    @Autowired
+    private lateinit var getConsultationChargeUseCase: GetConsultationChargeUseCase
 
     @Test
     fun `should calculate Ortho charge for less than 20 years experience`() {

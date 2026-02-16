@@ -1,19 +1,26 @@
 package org.example.healthcarebilling.domain.appointment
 
-import org.example.healthcarebilling.data.appointment.InMemoryAppointmentRepository
 import org.example.healthcarebilling.doctor
 import org.example.healthcarebilling.patient1
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.assertThrows
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.Test
 
+@SpringBootTest
+@Transactional
 class UpdateAppointmentStatusUseCaseTest {
 
-    private val appointmentRepository = InMemoryAppointmentRepository()
-    private val updateAppointmentStatusUseCase = UpdateAppointmentStatusUseCase(appointmentRepository)
+    @Autowired
+    private lateinit var appointmentRepository: AppointmentRepository
+
+    @Autowired
+    private lateinit var updateAppointmentStatusUseCase: UpdateAppointmentStatusUseCase
 
     @Test
     fun `should update appointment status to COMPLETED`() {

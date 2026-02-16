@@ -1,15 +1,22 @@
 package org.example.healthcarebilling.domain.patient
 
-import org.example.healthcarebilling.data.patient.InMemoryPatientRepository
 import org.example.healthcarebilling.patient1
 import org.junit.jupiter.api.Assertions.*
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import kotlin.test.Test
 
+@SpringBootTest
+@Transactional
 class GetPatientUseCaseTest {
 
-    private val patientRepository = InMemoryPatientRepository()
-    private val getPatientUseCase = GetPatientUseCase(patientRepository)
+    @Autowired
+    private lateinit var patientRepository: PatientRepository
+
+    @Autowired
+    private lateinit var getPatientUseCase: GetPatientUseCase
 
     @Test
     fun `should return patient when found by firstName lastName and dateOfBirth`() {

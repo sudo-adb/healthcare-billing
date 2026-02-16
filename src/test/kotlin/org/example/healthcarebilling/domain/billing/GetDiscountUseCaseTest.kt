@@ -1,27 +1,44 @@
 package org.example.healthcarebilling.domain.billing
 
-import org.example.healthcarebilling.data.appointment.InMemoryAppointmentRepository
-import org.example.healthcarebilling.data.doctor.InMemoryDoctorRepository
-import org.example.healthcarebilling.data.patient.InMemoryPatientRepository
 import org.example.healthcarebilling.doctor
 import org.example.healthcarebilling.domain.appointment.Appointment
+import org.example.healthcarebilling.domain.appointment.AppointmentRepository
 import org.example.healthcarebilling.domain.appointment.AppointmentStatus
 import org.example.healthcarebilling.domain.appointment.GetCompletedAppointmentCountUseCase
+import org.example.healthcarebilling.domain.doctor.DoctorRepository
+import org.example.healthcarebilling.domain.patient.PatientRepository
 import org.example.healthcarebilling.mediumExpCardioDoctor
 import org.example.healthcarebilling.patient1
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.annotation.DirtiesContext
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.Test
 
+@SpringBootTest
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class GetDiscountUseCaseTest {
 
-    private val appointmentRepository = InMemoryAppointmentRepository()
-    private val patientRepository = InMemoryPatientRepository()
-    private val doctorRepository = InMemoryDoctorRepository()
-    private val getCompletedAppointmentCountUseCase = GetCompletedAppointmentCountUseCase(appointmentRepository)
+    @Autowired
+    private lateinit var appointmentRepository: AppointmentRepository
+
+    @Autowired
+    private lateinit var patientRepository: PatientRepository
+
+    @Autowired
+    private lateinit var doctorRepository: DoctorRepository
+
+    @Autowired
+    private lateinit var getCompletedAppointmentCountUseCase: GetCompletedAppointmentCountUseCase
+
+    @Autowired
+    private lateinit var getDiscountUseCase: GetDiscountUseCase
+
     private val maxDiscount = 10
-    private val getDiscountUseCase = GetDiscountUseCase(getCompletedAppointmentCountUseCase, maxDiscount)
 
     @Test
     fun `should return 0 discount when patient has no completed appointments`() {

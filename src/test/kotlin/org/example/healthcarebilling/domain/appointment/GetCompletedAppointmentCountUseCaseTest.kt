@@ -1,17 +1,27 @@
 package org.example.healthcarebilling.domain.appointment
 
-import org.example.healthcarebilling.data.appointment.InMemoryAppointmentRepository
 import org.example.healthcarebilling.doctor
 import org.example.healthcarebilling.patient1
 import org.example.healthcarebilling.patient2
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.annotation.DirtiesContext
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.*
 import kotlin.test.Test
 
+@SpringBootTest
+@Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 class GetCompletedAppointmentCountUseCaseTest {
-    private val appointmentRepository = InMemoryAppointmentRepository()
-    private val getCompletedAppointmentCountUseCase = GetCompletedAppointmentCountUseCase(appointmentRepository)
+
+    @Autowired
+    private lateinit var appointmentRepository: AppointmentRepository
+
+    @Autowired
+    private lateinit var getCompletedAppointmentCountUseCase: GetCompletedAppointmentCountUseCase
 
     @Test
     fun `should return 0 when patient has no appointments`() {

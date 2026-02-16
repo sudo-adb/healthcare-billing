@@ -1,19 +1,25 @@
 package org.example.healthcarebilling.domain.insurance
 
-import org.example.healthcarebilling.data.patient.InMemoryPatientRepository
 import org.example.healthcarebilling.domain.patient.Patient
+import org.example.healthcarebilling.domain.patient.PatientRepository
 import org.example.healthcarebilling.domain.patient.insurance.AddPatientInsuranceUseCase
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.assertNotNull
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import kotlin.test.Test
 
-
+@SpringBootTest
+@Transactional
 class AddPatientInsuranceUseCaseTest {
 
+    @Autowired
+    private lateinit var patientRepository: PatientRepository
 
-    val patientRepository = InMemoryPatientRepository()
-    val addPatientInsuranceUseCase = AddPatientInsuranceUseCase(patientRepository)
+    @Autowired
+    private lateinit var addPatientInsuranceUseCase: AddPatientInsuranceUseCase
 
     @Test
     fun `should add insurance to patient`() {
@@ -31,10 +37,13 @@ class AddPatientInsuranceUseCaseTest {
 
         addPatientInsuranceUseCase(patient.id, binNumber, pcnNumber)
 
-        assertNotNull(patient.insurance)
-        assertNotNull(patient.insurance?.id)
-        assertEquals(patient.insurance?.binNumber, binNumber)
-        assertEquals(patient.insurance?.pcnNumber, pcnNumber)
+        val updatedPatient = patientRepository.findById(patient.id)
+
+        assertNotNull(updatedPatient)
+        assertNotNull(updatedPatient.insurance)
+        assertNotNull(updatedPatient.insurance?.id)
+        assertEquals(binNumber, updatedPatient.insurance?.binNumber)
+        assertEquals(pcnNumber, updatedPatient.insurance?.pcnNumber)
 
     }
 }

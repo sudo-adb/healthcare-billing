@@ -1,14 +1,18 @@
 package org.example.healthcarebilling.domain.doctor
 
-import org.example.healthcarebilling.data.doctor.InMemoryDoctorRepository
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.transaction.annotation.Transactional
 import kotlin.test.Test
 
+@SpringBootTest
+@Transactional
 class CreateDoctorUseCaseTest {
 
-    val doctorRepository = InMemoryDoctorRepository()
-    val createDoctorUseCase = CreateDoctorUseCase(doctorRepository)
+    @Autowired
+    private lateinit var createDoctorUseCase: CreateDoctorUseCase
 
     val testDoctorFirstName = "Jane"
     val testDoctorLastName = "Smith"
