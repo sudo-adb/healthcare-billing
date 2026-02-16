@@ -4,15 +4,18 @@ import jakarta.validation.Valid
 import org.example.healthcarebilling.domain.patient.CreatePatientUseCase
 import org.example.healthcarebilling.domain.patient.GetPatientUseCase
 import org.example.healthcarebilling.domain.patient.Patient
+import org.example.healthcarebilling.domain.patient.insurance.AddPatientInsuranceUseCase
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.time.LocalDate
+import java.util.UUID
 
 @RestController
 class PatientController @Autowired constructor(
     private val createPatientUseCase: CreatePatientUseCase,
-    private val getPatientUseCase: GetPatientUseCase
+    private val getPatientUseCase: GetPatientUseCase,
+    private val addPatientInsuranceUseCase: AddPatientInsuranceUseCase
 ) {
 
     @PostMapping("/patients")
@@ -36,5 +39,13 @@ class PatientController @Autowired constructor(
         } else {
             ResponseEntity.notFound().build()
         }
+    }
+
+    @PatchMapping("/patients/{id}/insurance")
+    fun addInsuranceToPatient(
+        @PathVariable id: UUID,
+        @Valid @RequestBody request: AddPatientInsuranceRequest
+    ): Patient {
+        return addPatientInsuranceUseCase(id, request.binNumber, request.pcnNumber)
     }
 }

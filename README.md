@@ -19,6 +19,8 @@ After applying the 12% tax, the final bill amount would be $1064.
 
 * `GET /patients?firstName=...&lastName=...&dateOfBirth=YYYY-MM-DD` - Find a patient
 
+* `PATCH /patients/{id}/insurance` - Add insurance to a patient
+
 * `POST /doctors` - Create a doctor
 
 * `GET /doctors?npiNumber=...` - Find a doctor by NPI number
@@ -67,7 +69,6 @@ The main idea:
 * As of now Copay is config and not consumed from insurance details.
 
 ### TODO
-* Add endpoint for updating patient insurance details or add api to create patient and insurance together.
 * Error handing and returning appropriate status codes and messages for different scenarios (e.g., patient not found, doctor not found, invalid input, etc.)
 * Add logging for better debugging and monitoring.
 * Add API documentation using Swagger or similar tools

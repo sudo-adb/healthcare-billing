@@ -140,4 +140,124 @@ class PatientControllerTest(@Autowired private val restTestClient: RestTestClien
             .exchange()
             .expectStatus().isBadRequest
     }
+
+    @Test
+    fun `should add insurance to patient`() {
+        val createPatientRequest = """
+        {
+            "firstName": "Will",
+            "lastName": "Gill",
+            "dateOfBirth": "1985-03-15"
+        }
+        """.trimIndent()
+
+        val createResponse = restTestClient.post()
+            .uri("/patients")
+            .contentType(APPLICATION_JSON)
+            .body(createPatientRequest)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<Patient>()
+            .returnResult()
+
+        val createdPatient = createResponse.responseBody
+        assertNotNull(createdPatient)
+
+        val addInsuranceRequest = """
+        {
+            "binNumber": "123456",
+            "pcnNumber": "PCN789"
+        }
+        """.trimIndent()
+
+        val insuranceResponse = restTestClient.patch()
+            .uri("/patients/${createdPatient.id}/insurance")
+            .contentType(APPLICATION_JSON)
+            .body(addInsuranceRequest)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<Patient>()
+            .returnResult()
+
+        val updatedPatient = insuranceResponse.responseBody
+        assertNotNull(updatedPatient)
+        assertNotNull(updatedPatient.insurance)
+        assertEquals("123456", updatedPatient.insurance?.binNumber)
+        assertEquals("PCN789", updatedPatient.insurance?.pcnNumber)
+        assertEquals(createdPatient.id, updatedPatient.insurance?.memberId)
+    }
+
+    @Test
+    fun `should return 400 when binNumber is blank`() {
+        val createPatientRequest = """
+        {
+            "firstName": "Tony",
+            "lastName": "Stark",
+            "dateOfBirth": "1980-01-01"
+        }
+        """.trimIndent()
+
+        val createResponse = restTestClient.post()
+            .uri("/patients")
+            .contentType(APPLICATION_JSON)
+            .body(createPatientRequest)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<Patient>()
+            .returnResult()
+
+        val createdPatient = createResponse.responseBody
+        assertNotNull(createdPatient)
+
+        val addInsuranceRequest = """
+        {
+            "binNumber": "",
+            "pcnNumber": "PCN123"
+        }
+        """.trimIndent()
+
+        restTestClient.patch()
+            .uri("/patients/${createdPatient.id}/insurance")
+            .contentType(APPLICATION_JSON)
+            .body(addInsuranceRequest)
+            .exchange()
+            .expectStatus().isBadRequest
+    }
+
+    @Test
+    fun `should return 400 when pcnNumber is blank`() {
+        val createPatientRequest = """
+        {
+            "firstName": "Peter",
+            "lastName": "Parker",
+            "dateOfBirth": "1990-01-01"
+        }
+        """.trimIndent()
+
+        val createResponse = restTestClient.post()
+            .uri("/patients")
+            .contentType(APPLICATION_JSON)
+            .body(createPatientRequest)
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<Patient>()
+            .returnResult()
+
+        val createdPatient = createResponse.responseBody
+        assertNotNull(createdPatient)
+
+        val addInsuranceRequest = """
+        {
+            "binNumber": "BIN456",
+            "pcnNumber": ""
+        }
+        """.trimIndent()
+
+        restTestClient.patch()
+            .uri("/patients/${createdPatient.id}/insurance")
+            .contentType(APPLICATION_JSON)
+            .body(addInsuranceRequest)
+            .exchange()
+            .expectStatus().isBadRequest
+    }
 }
