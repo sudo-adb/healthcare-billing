@@ -194,4 +194,26 @@ class AppointmentControllerTest(@Autowired private val restTestClient: RestTestC
             .exchange()
             .expectStatus().is5xxServerError
     }
+
+    @Test
+    fun `should return 400 when appointmentDateTime is in the past`() {
+        val patientId = patient1.id
+        val doctorId = doctor.id
+
+        val request = """
+        {
+            "patientId": "$patientId",
+            "doctorId": "$doctorId",
+            "appointmentDateTime": "2026-01-15T10:00:00"
+        }
+        """.trimIndent()
+
+        restTestClient.post()
+            .uri("/appointments")
+            .contentType(APPLICATION_JSON)
+            .body(request)
+            .exchange()
+            .expectStatus().isBadRequest
+    }
+
 }

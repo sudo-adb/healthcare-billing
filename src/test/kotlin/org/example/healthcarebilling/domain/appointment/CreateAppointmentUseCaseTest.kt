@@ -23,7 +23,7 @@ class CreateAppointmentUseCaseTest {
     fun `should create appointment with patient and doctor with SCHEDULED status`() {
         val patientId = patient1.id
         val doctorId = doctor.id
-        val appointmentDateTime = LocalDateTime.of(2026, 2, 15, 10, 30)
+        val appointmentDateTime = LocalDateTime.now().plusDays(1)
 
         val appointment = createAppointmentUseCase(
             patientId = patientId,

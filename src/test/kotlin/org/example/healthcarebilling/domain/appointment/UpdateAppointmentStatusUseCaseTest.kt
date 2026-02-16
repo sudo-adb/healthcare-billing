@@ -26,7 +26,7 @@ class UpdateAppointmentStatusUseCaseTest {
     fun `should update appointment status to COMPLETED`() {
         val patientId = patient1.id
         val doctorId = doctor.id
-        val appointmentDateTime = LocalDateTime.of(2026, 2, 15, 10, 30)
+        val appointmentDateTime = LocalDateTime.now().plusDays(1)
 
         val appointment = Appointment(
             patientId = patientId,
@@ -48,7 +48,7 @@ class UpdateAppointmentStatusUseCaseTest {
     fun `should update appointment status to CANCELLED`() {
         val patientId = patient1.id
         val doctorId = doctor.id
-        val appointmentDateTime = LocalDateTime.of(2026, 2, 15, 10, 30)
+        val appointmentDateTime = LocalDateTime.now().plusDays(1)
 
         val appointment = Appointment(
             patientId = patientId,

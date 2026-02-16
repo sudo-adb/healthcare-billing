@@ -38,7 +38,7 @@ class GetCompletedAppointmentCountUseCaseTest {
             Appointment(
                 patientId = patientId,
                 doctorId = doctorId,
-                appointmentDateTime = LocalDateTime.of(2026, 1, 15, 10, 0)
+                appointmentDateTime = LocalDateTime.now().plusDays(1)
             )
         )
         val count = getCompletedAppointmentCountUseCase(patientId)
@@ -52,14 +52,14 @@ class GetCompletedAppointmentCountUseCaseTest {
         val appointment1 = Appointment(
             patientId = patientId,
             doctorId = doctorId,
-            appointmentDateTime = LocalDateTime.of(2026, 1, 10, 10, 0)
+            appointmentDateTime = LocalDateTime.now().plusDays(1)
         )
         appointment1.status = AppointmentStatus.COMPLETED
         appointmentRepository.save(appointment1)
         val appointment2 = Appointment(
             patientId = patientId,
             doctorId = doctorId,
-            appointmentDateTime = LocalDateTime.of(2026, 1, 15, 14, 0)
+            appointmentDateTime = LocalDateTime.now().plusDays(1)
         )
         appointment2.status = AppointmentStatus.COMPLETED
         appointmentRepository.save(appointment2)
@@ -74,7 +74,7 @@ class GetCompletedAppointmentCountUseCaseTest {
         val completedAppointment = Appointment(
             patientId = patientId,
             doctorId = doctorId,
-            appointmentDateTime = LocalDateTime.of(2026, 1, 5, 10, 0)
+            appointmentDateTime = LocalDateTime.now().plusDays(1)
         )
         completedAppointment.status = AppointmentStatus.COMPLETED
         appointmentRepository.save(completedAppointment)
@@ -82,13 +82,13 @@ class GetCompletedAppointmentCountUseCaseTest {
             Appointment(
                 patientId = patientId,
                 doctorId = doctorId,
-                appointmentDateTime = LocalDateTime.of(2026, 2, 15, 10, 0)
+                appointmentDateTime = LocalDateTime.now().plusDays(1)
             )
         )
         val cancelledAppointment = Appointment(
             patientId = patientId,
             doctorId = doctorId,
-            appointmentDateTime = LocalDateTime.of(2026, 1, 20, 10, 0)
+            appointmentDateTime = LocalDateTime.now().plusDays(1)
         )
         cancelledAppointment.status = AppointmentStatus.CANCELLED
         appointmentRepository.save(cancelledAppointment)
@@ -105,7 +105,7 @@ class GetCompletedAppointmentCountUseCaseTest {
             val appointment = Appointment(
                 patientId = patient1Id,
                 doctorId = doctorId,
-                appointmentDateTime = LocalDateTime.of(2026, 1, it + 1, 10, 0)
+                appointmentDateTime = LocalDateTime.now().plusDays((it + 1).toLong())
             )
             appointment.status = AppointmentStatus.COMPLETED
             appointmentRepository.save(appointment)
@@ -114,7 +114,7 @@ class GetCompletedAppointmentCountUseCaseTest {
             val appointment = Appointment(
                 patientId = patient2Id,
                 doctorId = doctorId,
-                appointmentDateTime = LocalDateTime.of(2026, 1, it + 10, 10, 0)
+                appointmentDateTime = LocalDateTime.now().plusDays((it + 1).toLong())
             )
             appointment.status = AppointmentStatus.COMPLETED
             appointmentRepository.save(appointment)

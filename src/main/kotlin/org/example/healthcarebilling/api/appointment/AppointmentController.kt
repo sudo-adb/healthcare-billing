@@ -1,5 +1,6 @@
 package org.example.healthcarebilling.api.appointment
 
+import jakarta.validation.Valid
 import org.example.healthcarebilling.domain.appointment.Appointment
 import org.example.healthcarebilling.domain.appointment.CreateAppointmentUseCase
 import org.example.healthcarebilling.domain.appointment.UpdateAppointmentStatusUseCase
@@ -14,7 +15,7 @@ class AppointmentController @Autowired constructor(
 ) {
 
     @PostMapping("/appointments")
-    fun createAppointment(@RequestBody request: CreateAppointmentRequest): Appointment {
+    fun createAppointment(@Valid @RequestBody request: CreateAppointmentRequest): Appointment {
         return createAppointmentUseCase(
             patientId = request.patientId,
             doctorId = request.doctorId,
