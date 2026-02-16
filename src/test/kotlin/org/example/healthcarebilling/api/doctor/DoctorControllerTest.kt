@@ -128,4 +128,49 @@ class DoctorControllerTest(@Autowired private val restTestClient: RestTestClient
             .exchange()
             .expectStatus().isBadRequest
     }
+
+    @Test
+    fun `should find doctor by NPI number`() {
+
+        val jsonRequest = """
+        {
+            "firstName": "John",
+            "lastName": "Doe",
+            "npiNumber": "9876543210",
+            "specialty": "Neurology",
+            "practiceStartDate": "2010-03-20"
+        }
+        """.trimIndent()
+
+        restTestClient.post()
+            .uri("/doctors")
+            .contentType(APPLICATION_JSON)
+            .body(jsonRequest)
+            .exchange()
+            .expectStatus().isOk
+
+
+        val response = restTestClient.get()
+            .uri("/doctors?npiNumber=9876543210")
+            .exchange()
+            .expectStatus().isOk
+            .expectBody<Doctor>()
+            .returnResult()
+
+        val foundDoctor = response.responseBody
+        assertNotNull(foundDoctor)
+        assertEquals("John", foundDoctor.firstName)
+        assertEquals("Doe", foundDoctor.lastName)
+        assertEquals("9876543210", foundDoctor.npiNumber)
+        assertEquals("Neurology", foundDoctor.specialty)
+        assertEquals("2010-03-20", foundDoctor.practiceStartDate.toString())
+    }
+
+    @Test
+    fun `should return 404 when doctor not found by NPI number`() {
+        restTestClient.get()
+            .uri("/doctors?npiNumber=0000000000")
+            .exchange()
+            .expectStatus().isNotFound
+    }
 }

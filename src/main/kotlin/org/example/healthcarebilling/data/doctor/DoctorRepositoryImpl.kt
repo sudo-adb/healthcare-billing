@@ -21,5 +21,9 @@ class DoctorRepositoryImpl(
     override fun findById(id: UUID): Doctor? {
         return jpaDoctorRepository.findById(id).map { it.toDomain() }.orElse(null)
     }
+
+    override fun findByNpiNumber(npiNumber: String): Doctor? {
+        return jpaDoctorRepository.findByNpiNumber(npiNumber)?.toDomain()
+    }
 }
 
