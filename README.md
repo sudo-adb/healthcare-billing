@@ -10,8 +10,9 @@ Calculates bills based on  following rules:
 For example:
 For a patient is visiting a Cardio Specialist with 15 years of exp and has had 5 previous appointments,
 they would receive a 5% discount on the consultation charges. 
-If the consultation charge is $1000, the discounted amount would be $950.
-After applying the 12% tax, the final bill amount would be $1064.
+If the consultation charge is `$1000`, the discounted amount would be `$950`.
+After applying the 12% tax, the final bill amount would be `$1064`.
+10% of the final bill amount will be copay and the remaining will be covered by insurance. Here copay will be `$106.4`
 
 ### Endpoints
 
@@ -30,6 +31,8 @@ After applying the 12% tax, the final bill amount would be $1064.
 * `PATCH /appointments/{id}/status` - Update appointment status
 
 * `POST /bills` - Generate a bill for a patient + doctor
+
+* `GET /actuator/health` - Check application health
 
 ### Build and Run
 
@@ -65,7 +68,7 @@ The main idea:
   *  Step 4: Update appointment status to COMPLETED using `PATCH /appointments/{id}/status` [OPTIONAL]
   *  Step 5: Generate a bill for the patient and doctor using `POST /bills`
 * Assuming Patient is having an insurance we are not creating any insurance by default while creating a patient
-* A insurance can be added to the patient using `PATCH /patients/{id}/insurance` endpoint.
+* An insurance can be added to the patient using `PATCH /patients/{id}/insurance` endpoint.
 * As of now Copay is config and not consumed from insurance details.
 
 ### TODO
