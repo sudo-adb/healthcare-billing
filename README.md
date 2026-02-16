@@ -21,6 +21,8 @@ After applying the 12% tax, the final bill amount would be $1064.
 
 * `POST /doctors` - Create a doctor
 
+* `GET /doctors?npiNumber=...` - Find a doctor by NPI number
+
 * `POST /appointments` - Create an appointment
 
 * `PATCH /appointments/{id}/status` - Update appointment status
@@ -35,6 +37,17 @@ After applying the 12% tax, the final bill amount would be $1064.
 
 `./gradlew build` : Build the jar
 
+### Architecture Guide (healthcare-billing)
+
+This codebase follows a **simple layered + use-case-first** style (inspired by Clean Architecture / Hexagonal Architecture).
+
+The main idea:
+
+- Start every feature with a **domain entity** and a **use case**.
+- Define **repository** (interfaces) in the domain.
+- Implement repository in the **data** layer.
+- Expose use cases via the **api** layer.
+
 
 ### Assumptions and Implementations
 * The currency is assumed to be `$`, not mentioned or displayed explicitly in any response
@@ -43,7 +56,18 @@ After applying the 12% tax, the final bill amount would be $1064.
 * For Bill generation, no prior/active scheduled appointment is required, as long as the patient and doctor exist in the system, a bill can be generated based on the consultation charges, discounts, and tax rules.
 * By Default the appointment status is set to SCHEDULED when created, and it can be updated to COMPLETED or CANCELLED using the status update endpoint.
 * While creating appoint, no validation is done to check if the patient already has an appointment with the same doctor at the same date and time.
-* No Validation is done to check appoint date and time, it is assumed that the provided date and time are valid and in the future.
+* Assumed the apis will be consumed by frontend, using the below follow:
+  *  Step 1: Create a patient using `POST /patients`
+  *  Step 2: Create a doctor using `POST /doctors`
+  *  Step 3: Create an appointment using `POST /appointments` with the patient [OPTIONAL]
+  *  Step 4: Update appointment status to COMPLETED using `PATCH /appointments/{id}/status` [OPTIONAL]
+  *  Step 5: Generate a bill for the patient and doctor using `POST /bills`
+* Assuming Patient is having an insurance we are not creating any insurance by default while creating a patient
+* A insurance can be added to the patient using `PATCH /patients/{id}/insurance` endpoint.
+* As of now Copay is config and not consumed from insurance details.
 
 ### TODO
-
+* Add endpoint for updating patient insurance details or add api to create patient and insurance together.
+* Error handing and returning appropriate status codes and messages for different scenarios (e.g., patient not found, doctor not found, invalid input, etc.)
+* Add logging for better debugging and monitoring.
+* Add API documentation using Swagger or similar tools
