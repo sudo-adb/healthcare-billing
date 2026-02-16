@@ -1,0 +1,18 @@
+package org.life.healthcarebilling.domain.billing
+
+import org.life.healthcarebilling.domain.appointment.GetCompletedAppointmentCountUseCase
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.stereotype.Component
+import java.util.*
+import kotlin.math.min
+
+@Component
+class GetDiscountUseCase(
+    private val getCompletedAppointmentCountUseCase: GetCompletedAppointmentCountUseCase,
+    @Value($$"${billing.discount.max}") private val maxDiscount: Int
+) {
+    operator fun invoke(patientId: UUID): Int {
+        val completedAppointmentsCount = getCompletedAppointmentCountUseCase(patientId)
+        return min(completedAppointmentsCount, maxDiscount)
+    }
+}
